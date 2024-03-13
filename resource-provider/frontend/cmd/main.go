@@ -6,13 +6,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/ARO-HCP/resource-provider/frontend"
+	"github.com/Azure/ARO-HCP/resource-provider/util/version"
 	"log/slog"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/Azure/ARO-HCP/pkg/util/version"
 )
 
 const ProgramName = "ARO HCP Frontend"
@@ -36,13 +36,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	frontend := NewFrontend(logger, listener)
-	go frontend.Run(ctx, stop)
+	f := frontend.NewFrontend(logger, listener)
+	go f.Run(ctx, stop)
 
 	sig := <-signalChannel
 	logger.Info(fmt.Sprintf("caught %s signal", sig))
 	close(stop)
-	frontend.Join()
+	f.Join()
 
 	logger.Info(fmt.Sprintf("%s (%s) stopped", ProgramName, version.Version))
 }

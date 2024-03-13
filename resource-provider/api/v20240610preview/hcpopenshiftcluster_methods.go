@@ -4,12 +4,11 @@ package v20240610preview
 // Licensed under the Apache License 2.0.
 
 import (
+	api2 "github.com/Azure/ARO-HCP/toolkit/api"
 	"slices"
-
-	"github.com/Azure/ARO-HCP/pkg/api"
 )
 
-func (v *version) NewHCPOpenShiftCluster(from *api.HCPOpenShiftCluster) api.VersionedHCPOpenShiftCluster {
+func (v *version) NewHCPOpenShiftCluster(from *api2.HCPOpenShiftCluster) api2.VersionedHCPOpenShiftCluster {
 	out := &HCPOpenShiftCluster{
 		Properties: HCPOpenShiftClusterProperties{
 			ProvisioningState: from.Properties.ProvisioningState,
@@ -75,47 +74,47 @@ func (v *version) NewHCPOpenShiftCluster(from *api.HCPOpenShiftCluster) api.Vers
 	return out
 }
 
-func (c *HCPOpenShiftCluster) Normalize(out *api.HCPOpenShiftCluster) {
+func (c *HCPOpenShiftCluster) Normalize(out *api2.HCPOpenShiftCluster) {
 	c.TrackedResource.Copy(&out.TrackedResource)
 	out.Properties.ProvisioningState = c.Properties.ProvisioningState
 	out.Properties.ClusterProfile.ControlPlaneVersion = c.Properties.ClusterProfile.ControlPlaneVersion
 	out.Properties.ClusterProfile.SubnetID = c.Properties.ClusterProfile.SubnetID
 	out.Properties.APIProfile.URL = c.Properties.APIProfile.URL
 	out.Properties.APIProfile.IP = c.Properties.APIProfile.IP
-	out.Properties.APIProfile.Visibility = api.Visibility(c.Properties.APIProfile.Visibility)
+	out.Properties.APIProfile.Visibility = api2.Visibility(c.Properties.APIProfile.Visibility)
 	out.Properties.ConsoleProfile.URL = c.Properties.ConsoleProfile.URL
-	out.Properties.IngressProfiles = make([]api.IngressProfile, 0, len(c.Properties.IngressProfiles))
+	out.Properties.IngressProfiles = make([]api2.IngressProfile, 0, len(c.Properties.IngressProfiles))
 	for _, item := range c.Properties.IngressProfiles {
 		out.Properties.IngressProfiles = append(
 			out.Properties.IngressProfiles,
-			api.IngressProfile{
+			api2.IngressProfile{
 				IP:         item.IP,
 				Name:       item.Name,
-				Visibility: api.Visibility(item.Visibility),
+				Visibility: api2.Visibility(item.Visibility),
 			})
 	}
 	out.Properties.NetworkProfile.PodCIDR = c.Properties.NetworkProfile.PodCIDR
 	out.Properties.NetworkProfile.ServiceCIDR = c.Properties.NetworkProfile.ServiceCIDR
 	out.Properties.NetworkProfile.HostPrefix = c.Properties.NetworkProfile.HostPrefix
-	out.Properties.NetworkProfile.OutboundType = api.OutboundType(c.Properties.NetworkProfile.OutboundType)
-	out.Properties.NetworkProfile.PreconfiguredNSGs = api.PreconfiguredNSGs(c.Properties.NetworkProfile.PreconfiguredNSGs)
-	out.Properties.NodePoolProfiles = make([]api.NodePoolProfile, 0, len(c.Properties.NodePoolProfiles))
+	out.Properties.NetworkProfile.OutboundType = api2.OutboundType(c.Properties.NetworkProfile.OutboundType)
+	out.Properties.NetworkProfile.PreconfiguredNSGs = api2.PreconfiguredNSGs(c.Properties.NetworkProfile.PreconfiguredNSGs)
+	out.Properties.NodePoolProfiles = make([]api2.NodePoolProfile, 0, len(c.Properties.NodePoolProfiles))
 	for _, item := range c.Properties.NodePoolProfiles {
 		out.Properties.NodePoolProfiles = append(
 			out.Properties.NodePoolProfiles,
-			api.NodePoolProfile{
+			api2.NodePoolProfile{
 				Name:             item.Name,
 				Replicas:         item.Replicas,
 				SubnetID:         item.SubnetID,
 				EncryptionAtHost: item.EncryptionAtHost,
 				VMSize:           item.VMSize,
-				Autoscaling: api.NodePoolAutoscaling{
+				Autoscaling: api2.NodePoolAutoscaling{
 					MinReplicas: item.Autoscaling.MinReplicas,
 					MaxReplicas: item.Autoscaling.MaxReplicas,
 				},
 			})
 	}
-	out.Properties.EtcdEncryption = api.EtcdEncryptionProfile{
+	out.Properties.EtcdEncryption = api2.EtcdEncryptionProfile{
 		DiscEncryptionSetID: c.Properties.EtcdEncryption.DiscEncryptionSetID,
 	}
 	out.Properties.AutoRepair = c.Properties.AutoRepair

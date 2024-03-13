@@ -1,12 +1,11 @@
-package main
+package frontend
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the Apache License 2.0.
 
 import (
+	"github.com/Azure/ARO-HCP/resource-provider/api/arm"
 	"net/http"
-
-	"github.com/Azure/ARO-HCP/pkg/api/arm"
 )
 
 func MiddlewarePanic(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

@@ -4,10 +4,9 @@ package v20240610preview
 // Licensed under the Apache License 2.0.
 
 import (
+	"github.com/Azure/ARO-HCP/toolkit/api/arm"
+	"github.com/Azure/ARO-HCP/toolkit/api/json"
 	"net"
-
-	"github.com/Azure/ARO-HCP/pkg/api/arm"
-	"github.com/Azure/ARO-HCP/pkg/api/json"
 )
 
 // HCPOpenShiftCluster represents an ARO HCP OpenShift cluster resource.
@@ -77,7 +76,9 @@ const (
 // PreconfiguredNSGs represents whether to use a bring-your-own network security
 // group (NSG) attached to the subnets.
 // FIXME Maybe convert this to a boolean type with JSON marshal/unmarshal
-//       methods, even if the TypeSpec can't represent it as a boolean?
+//
+//	methods, even if the TypeSpec can't represent it as a boolean?
+//
 // Visibility for the entire struct is "read,create".
 type PreconfiguredNSGs struct {
 	Enabled  string `json:"enabled,omitempty"`

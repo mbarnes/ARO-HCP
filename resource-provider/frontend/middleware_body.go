@@ -1,15 +1,14 @@
-package main
+package frontend
 
 // Copyright (c) Microsoft Corporation.
 // Licensed under the Apache License 2.0.
 
 import (
 	"context"
+	"github.com/Azure/ARO-HCP/resource-provider/api/arm"
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/Azure/ARO-HCP/pkg/api/arm"
 )
 
 func MiddlewareBody(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
