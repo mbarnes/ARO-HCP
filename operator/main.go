@@ -6,14 +6,17 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+
+	aro_clientset "github.com/Azure/ARO-HCP/operator/pkg/generated/clientset/versioned"
+	aro_informers "github.com/Azure/ARO-HCP/operator/pkg/generated/informers/externalversions"
 )
 
 var (
@@ -63,7 +66,25 @@ func main() {
 		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
 	}
 
-	fmt.Println(kubeClient)
+	operationClient, err := aro_clientset.NewForConfig(cfg)
+	if err != nil {
+		logger.Error(err, "Error building kubernetes clientset")
+		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+	}
+
+	operationInformerFactory := aro_informers.NewSharedInformerFactory(operationClient, time.Second*30)
+
+	controller := NewController(ctx, kubeClient, operationClient,
+		operationInformerFactory.Arohcp().V1alpha1().Operations())
+
+	// notice that there is no need to run Start methods in a separate goroutine.
+	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
+	operationInformerFactory.Start(ctx.Done())
+
+	if err = controller.Run(ctx, 2); err != nil {
+		logger.Error(err, "Error running controller")
+		klog.FlushAndExit(klog.ExitFlushTimeout, 1)
+	}
 }
 
 func init() {
