@@ -155,7 +155,7 @@ var _ = Describe("Customer", func() {
 
 			By("updating the cluster to add a second ImageDigestMirror set")
 			updateAdd := hcpsdk20251223preview.HcpOpenShiftClusterUpdate{
-				Properties: &hcpsdk20251223preview.HcpOpenShiftClusterPropertiesUpdate{
+				Properties: &hcpsdk20251223preview.HcpOpenShiftClusterUpdateProperties{
 					ImageDigestMirrors: []*hcpsdk20251223preview.ImageDigestMirror{
 						{
 							Source:  to.Ptr(idmsSource),
@@ -208,7 +208,7 @@ var _ = Describe("Customer", func() {
 
 			By("updating the cluster to remove the second ImageDigestMirror set")
 			updateRemove := hcpsdk20251223preview.HcpOpenShiftClusterUpdate{
-				Properties: &hcpsdk20251223preview.HcpOpenShiftClusterPropertiesUpdate{
+				Properties: &hcpsdk20251223preview.HcpOpenShiftClusterUpdateProperties{
 					ImageDigestMirrors: []*hcpsdk20251223preview.ImageDigestMirror{
 						{
 							Source:  to.Ptr(idmsSource),

@@ -143,12 +143,12 @@ var _ = Describe("Customer", func() {
 				*resourceGroup.Name,
 				clusterName,
 				hcpsdk20260630preview.HcpOpenShiftClusterUpdate{
-					Properties: &hcpsdk20260630preview.HcpOpenShiftClusterPropertiesUpdate{
-						Etcd: &hcpsdk20260630preview.EtcdProfileUpdate{
-							DataEncryption: &hcpsdk20260630preview.EtcdDataEncryptionProfileUpdate{
-								CustomerManaged: &hcpsdk20260630preview.CustomerManagedEncryptionProfileUpdate{
-									Kms: &hcpsdk20260630preview.KmsEncryptionProfileUpdate{
-										ActiveKey: &hcpsdk20260630preview.KmsKeyUpdate{
+					Properties: &hcpsdk20260630preview.HcpOpenShiftClusterUpdateProperties{
+						Etcd: &hcpsdk20260630preview.EtcdProfile{
+							DataEncryption: &hcpsdk20260630preview.EtcdDataEncryptionProfile{
+								CustomerManaged: &hcpsdk20260630preview.CustomerManagedEncryptionProfile{
+									Kms: &hcpsdk20260630preview.KmsEncryptionProfile{
+										ActiveKey: &hcpsdk20260630preview.KmsKey{
 											Version: to.Ptr(firstKeyVersion),
 										},
 									},
@@ -246,12 +246,12 @@ var _ = Describe("Customer", func() {
 				*resourceGroup.Name,
 				clusterName,
 				hcpsdk20260630preview.HcpOpenShiftClusterUpdate{
-					Properties: &hcpsdk20260630preview.HcpOpenShiftClusterPropertiesUpdate{
-						Etcd: &hcpsdk20260630preview.EtcdProfileUpdate{
-							DataEncryption: &hcpsdk20260630preview.EtcdDataEncryptionProfileUpdate{
-								CustomerManaged: &hcpsdk20260630preview.CustomerManagedEncryptionProfileUpdate{
-									Kms: &hcpsdk20260630preview.KmsEncryptionProfileUpdate{
-										ActiveKey: &hcpsdk20260630preview.KmsKeyUpdate{
+					Properties: &hcpsdk20260630preview.HcpOpenShiftClusterUpdateProperties{
+						Etcd: &hcpsdk20260630preview.EtcdProfile{
+							DataEncryption: &hcpsdk20260630preview.EtcdDataEncryptionProfile{
+								CustomerManaged: &hcpsdk20260630preview.CustomerManagedEncryptionProfile{
+									Kms: &hcpsdk20260630preview.KmsEncryptionProfile{
+										ActiveKey: &hcpsdk20260630preview.KmsKey{
 											Version: to.Ptr(secondKeyVersion),
 										},
 									},

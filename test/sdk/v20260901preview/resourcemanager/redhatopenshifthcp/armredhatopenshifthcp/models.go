@@ -18,43 +18,11 @@ type APIProfile struct {
 	AuthorizedCIDRs []*string
 }
 
-// AzureResourceManagerCommonTypesManagedServiceIdentityUpdate - Managed service identity (system assigned and/or user assigned
-// identities)
-type AzureResourceManagerCommonTypesManagedServiceIdentityUpdate struct {
-	// The type of managed identity assigned to this resource.
-	Type *ManagedServiceIdentityType
-
-	// The identities assigned to this resource by the user.
-	UserAssignedIdentities map[string]*UserAssignedIdentity
-}
-
-// AzureResourceManagerCommonTypesTrackedResourceUpdate - The resource model definition for an Azure Resource Manager tracked
-// top level resource which has 'tags' and a 'location'
-type AzureResourceManagerCommonTypesTrackedResourceUpdate struct {
-	// Resource tags.
-	Tags map[string]*string
-
-	// READ-ONLY; Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
-	ID *string
-
-	// READ-ONLY; The name of the resource
-	Name *string
-
-	// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
-	SystemData *SystemData
-
-	// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
-	Type *string
-}
-
 // ClusterAutoscalingProfile - ClusterAutoscaling specifies auto-scaling behavior that applies to all NodePools associated
 // with a control plane.
 type ClusterAutoscalingProfile struct {
 	// maxNodeProvisionTimeSeconds is the maximum time to wait for node provisioning before considering the provisioning to be
 	// unsuccessful. The default is 900 seconds, or 15 minutes.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
 	MaxNodeProvisionTimeSeconds *int32
 
 	// maxNodesTotal is the maximum allowable number of nodes for the Autoscaler scale out to be operational. The autoscaler will
@@ -64,17 +32,11 @@ type ClusterAutoscalingProfile struct {
 
 	// maxPodGracePeriod is the maximum seconds to wait for graceful pod termination before scaling down a NodePool. The default
 	// is 600 seconds.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
 	MaxPodGracePeriodSeconds *int32
 
 	// podPriorityThreshold enables users to schedule "best-effort" pods, which shouldn't trigger autoscaler actions, but only
 	// run when there are spare resources available. The default is -10. See the
 	// following for more details: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-does-cluster-autoscaler-work-with-pod-priority-and-preemption
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
 	PodPriorityThreshold *int32
 }
 
@@ -120,13 +82,6 @@ type CustomerManagedEncryptionProfile struct {
 	// The Key Management Service (KMS) encryption key details.
 	// Required when encryptionType is "KMS".
 	Kms *KmsEncryptionProfile
-}
-
-// CustomerManagedEncryptionProfileUpdate - Customer managed encryption key profile.
-type CustomerManagedEncryptionProfileUpdate struct {
-	// The Key Management Service (KMS) encryption key details.
-	// Required when encryptionType is "KMS".
-	Kms *KmsEncryptionProfileUpdate
 }
 
 // DNSProfile - DNS contains the DNS settings of the cluster
@@ -182,22 +137,10 @@ type EtcdDataEncryptionProfile struct {
 	CustomerManaged *CustomerManagedEncryptionProfile
 }
 
-// EtcdDataEncryptionProfileUpdate - The ETCD data encryption settings.
-type EtcdDataEncryptionProfileUpdate struct {
-	// Specify customer managed encryption key details. Required when keyManagementMode is "CustomerManaged".
-	CustomerManaged *CustomerManagedEncryptionProfileUpdate
-}
-
 // EtcdProfile - The ETCD settings and configuration options.
 type EtcdProfile struct {
 	// ETCD Data Encryption settings. If not specified platform managed keys are used.
 	DataEncryption *EtcdDataEncryptionProfile
-}
-
-// EtcdProfileUpdate - The ETCD settings and configuration options.
-type EtcdProfileUpdate struct {
-	// ETCD Data Encryption settings. If not specified platform managed keys are used.
-	DataEncryption *EtcdDataEncryptionProfileUpdate
 }
 
 // ExternalAuth resource
@@ -222,15 +165,6 @@ type ExternalAuth struct {
 type ExternalAuthClaimProfile struct {
 	// REQUIRED; The claim mappings
 	Mappings *TokenClaimMappingsProfile
-
-	// The claim validation rules
-	ValidationRules []*TokenClaimValidationRule
-}
-
-// ExternalAuthClaimProfileUpdate - External Auth claim profile
-type ExternalAuthClaimProfileUpdate struct {
-	// The claim mappings
-	Mappings *TokenClaimMappingsProfileUpdate
 
 	// The claim validation rules
 	ValidationRules []*TokenClaimValidationRule
@@ -294,34 +228,22 @@ type ExternalAuthProperties struct {
 	Status *ResourceStatus
 }
 
-// ExternalAuthPropertiesUpdate - External Auth profile
-type ExternalAuthPropertiesUpdate struct {
+// ExternalAuthUpdate - ExternalAuth resource
+type ExternalAuthUpdate struct {
+	// The resource-specific properties for this resource.
+	Properties *ExternalAuthUpdateProperties
+}
+
+// ExternalAuthUpdateProperties - The updatable properties of the ExternalAuth.
+type ExternalAuthUpdateProperties struct {
 	// External Auth claim This configures how claims are validated and applied.
-	Claim *ExternalAuthClaimProfileUpdate
+	Claim *ExternalAuthClaimProfile
 
 	// External Auth OIDC clients There must not be more than 20 entries and entries must have unique namespace/name pairs.
 	Clients []*ExternalAuthClientProfile
 
 	// Token Issuer profile
-	Issuer *TokenIssuerProfileUpdate
-}
-
-// ExternalAuthUpdate - ExternalAuth resource
-type ExternalAuthUpdate struct {
-	// The resource-specific properties for this resource.
-	Properties *ExternalAuthPropertiesUpdate
-
-	// READ-ONLY; Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
-	ID *string
-
-	// READ-ONLY; The name of the resource
-	Name *string
-
-	// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
-	SystemData *SystemData
-
-	// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
-	Type *string
+	Issuer *TokenIssuerProfile
 }
 
 // GroupClaimProfile - External Auth claim profile This configures how the groups of a cluster identity should be constructed
@@ -330,18 +252,6 @@ type ExternalAuthUpdate struct {
 // For example - '"example"' and '"exampleOne", "exampleTwo", "exampleThree"' are valid claim values.
 type GroupClaimProfile struct {
 	// REQUIRED; Claim name of the external profile
-	Claim *string
-
-	// Prefix for the claim external profile If this is specified prefixPolicy will be set to "Prefix" by default
-	Prefix *string
-}
-
-// GroupClaimProfileUpdate - External Auth claim profile This configures how the groups of a cluster identity should be constructed
-// from the claims in a JWT token issued by the identity provider. When referencing a claim, if the
-// claim is present in the JWT token, its value must be a list of groups separated by a comma (',').
-// For example - '"example"' and '"exampleOne", "exampleTwo", "exampleThree"' are valid claim values.
-type GroupClaimProfileUpdate struct {
-	// Claim name of the external profile
 	Claim *string
 
 	// Prefix for the claim external profile If this is specified prefixPolicy will be set to "Prefix" by default
@@ -455,13 +365,25 @@ type HcpOpenShiftClusterProperties struct {
 	Status *ResourceStatus
 }
 
-// HcpOpenShiftClusterPropertiesUpdate - HCP cluster properties
-type HcpOpenShiftClusterPropertiesUpdate struct {
+// HcpOpenShiftClusterUpdate - HCP cluster resource
+type HcpOpenShiftClusterUpdate struct {
+	// The managed service identities assigned to this resource.
+	Identity *ManagedServiceIdentity
+
+	// The resource-specific properties for this resource.
+	Properties *HcpOpenShiftClusterUpdateProperties
+
+	// Resource tags.
+	Tags map[string]*string
+}
+
+// HcpOpenShiftClusterUpdateProperties - The updatable properties of the HcpOpenShiftCluster.
+type HcpOpenShiftClusterUpdateProperties struct {
 	// Configure ClusterAutoscaling .
 	Autoscaling *ClusterAutoscalingProfile
 
 	// Configure ETCD.
-	Etcd *EtcdProfileUpdate
+	Etcd *EtcdProfile
 
 	// imageDigestMirrors is a set of rules to allow pulling images from a mirrored registry by using digest specifications.
 	// WARNING: Updating this array will redeploy all node pools in the cluster.
@@ -478,34 +400,10 @@ type HcpOpenShiftClusterPropertiesUpdate struct {
 	NodeDrainTimeoutMinutes *int32
 
 	// Azure platform configuration
-	Platform *PlatformProfileUpdate
+	Platform *PlatformProfile
 
 	// Version of the control plane components
-	Version *VersionProfileUpdate
-}
-
-// HcpOpenShiftClusterUpdate - HCP cluster resource
-type HcpOpenShiftClusterUpdate struct {
-	// The managed service identities assigned to this resource.
-	Identity *AzureResourceManagerCommonTypesManagedServiceIdentityUpdate
-
-	// The resource-specific properties for this resource.
-	Properties *HcpOpenShiftClusterPropertiesUpdate
-
-	// Resource tags.
-	Tags map[string]*string
-
-	// READ-ONLY; Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
-	ID *string
-
-	// READ-ONLY; The name of the resource
-	Name *string
-
-	// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
-	SystemData *SystemData
-
-	// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
-	Type *string
+	Version *VersionProfile
 }
 
 // HcpOpenShiftVersion represents a location based available HCP OpenShift version
@@ -637,26 +535,12 @@ type KmsEncryptionProfile struct {
 	Visibility *KeyVaultVisibility
 }
 
-// KmsEncryptionProfileUpdate - Configure etcd encryption Key Management Service (KMS) key. Your Microsoft Entra application
-// used to create the cluster must be authorized to access this keyvault, e.g using the AzureCLI: az keyvault
-// set-policy -n $KEYVAULT_NAME --key-permissions decrypt encrypt --spn (YOUR APPLICATION CLIENT ID)
-type KmsEncryptionProfileUpdate struct {
-	// The details of the active key.
-	ActiveKey *KmsKeyUpdate
-}
-
 // KmsKey - A representation of a KeyVault Secret.
 type KmsKey struct {
 	// REQUIRED; name is the name of the keyvault key used for encryption/decryption.
 	Name *string
 
 	// REQUIRED; version contains the version of the key to use.
-	Version *string
-}
-
-// KmsKeyUpdate - A representation of a KeyVault Secret.
-type KmsKeyUpdate struct {
-	// version contains the version of the key to use.
 	Version *string
 }
 
@@ -707,7 +591,7 @@ type NetworkProfile struct {
 	ServiceCIDR *string
 }
 
-// NodePool - Concrete tracked resource types can be created by aliasing this type using a specific property type.
+// NodePool resource
 type NodePool struct {
 	// REQUIRED; The geo-location where the resource lives
 	Location *string
@@ -822,8 +706,20 @@ type NodePoolProperties struct {
 	Status *ResourceStatus
 }
 
-// NodePoolPropertiesUpdate - Represents the node pool properties
-type NodePoolPropertiesUpdate struct {
+// NodePoolUpdate - NodePool resource
+type NodePoolUpdate struct {
+	// The managed service identities assigned to this resource.
+	Identity *ManagedServiceIdentity
+
+	// The resource-specific properties for this resource.
+	Properties *NodePoolUpdateProperties
+
+	// Resource tags.
+	Tags map[string]*string
+}
+
+// NodePoolUpdateProperties - The updatable properties of the NodePool.
+type NodePoolUpdateProperties struct {
 	// Representation of a autoscaling in a node pool.
 	AutoScaling *NodePoolAutoScaling
 
@@ -849,31 +745,7 @@ type NodePoolPropertiesUpdate struct {
 	Taints []*Taint
 
 	// OpenShift version for the nodepool
-	Version *NodePoolVersionProfileUpdate
-}
-
-// NodePoolUpdate - Concrete tracked resource types can be created by aliasing this type using a specific property type.
-type NodePoolUpdate struct {
-	// The managed service identities assigned to this resource.
-	Identity *AzureResourceManagerCommonTypesManagedServiceIdentityUpdate
-
-	// The resource-specific properties for this resource.
-	Properties *NodePoolPropertiesUpdate
-
-	// Resource tags.
-	Tags map[string]*string
-
-	// READ-ONLY; Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
-	ID *string
-
-	// READ-ONLY; The name of the resource
-	Name *string
-
-	// READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
-	SystemData *SystemData
-
-	// READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
-	Type *string
+	Version *NodePoolVersionProfile
 }
 
 // NodePoolVersionProfile - Versions represents an OpenShift version.
@@ -883,23 +755,7 @@ type NodePoolVersionProfile struct {
 
 	// ChannelGroup is the name of the set to which this version belongs. Each version belongs to only a single set.
 	// If not specified, the default value is 'stable'.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
 	ChannelGroup *string
-}
-
-// NodePoolVersionProfileUpdate - Versions represents an OpenShift version.
-type NodePoolVersionProfileUpdate struct {
-	// ChannelGroup is the name of the set to which this version belongs. Each version belongs to only a single set.
-	// If not specified, the default value is 'stable'.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
-	ChannelGroup *string
-
-	// ID is the unique identifier of the version.
-	ID *string
 }
 
 // Operation - Details of a REST API operation, returned from the Resource Provider Operations API
@@ -970,13 +826,6 @@ type OperatorsAuthenticationProfile struct {
 	UserAssignedIdentities *UserAssignedIdentitiesProfile
 }
 
-// OperatorsAuthenticationProfileUpdate - The configuration that the operators of the cluster have to authenticate to Azure.
-type OperatorsAuthenticationProfileUpdate struct {
-	// Represents the information related to Azure User-Assigned managed identities needed to perform Operators authentication
-	// based on Azure User-Assigned Managed Identities
-	UserAssignedIdentities *UserAssignedIdentitiesProfileUpdate
-}
-
 // OsDiskProfile - The settings and configuration options for OSDisk
 type OsDiskProfile struct {
 	// The type of the disk storage account
@@ -1030,12 +879,6 @@ type PlatformProfile struct {
 
 	// READ-ONLY; URL for the OIDC provider to be used for authentication to authenticate against user Azure cloud account
 	IssuerURL *string
-}
-
-// PlatformProfileUpdate - Azure specific configuration
-type PlatformProfileUpdate struct {
-	// The configuration that the operators of the cluster have to authenticate to Azure
-	OperatorsAuthentication *OperatorsAuthenticationProfileUpdate
 }
 
 // ProxyResource - The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a
@@ -1126,15 +969,6 @@ type TokenClaimMappingsProfile struct {
 	Groups *GroupClaimProfile
 }
 
-// TokenClaimMappingsProfileUpdate - External Auth claim mappings profile. At a minimum username or groups must be defined.
-type TokenClaimMappingsProfileUpdate struct {
-	// The claim mappings groups.
-	Groups *GroupClaimProfileUpdate
-
-	// The claim mappings username.
-	Username *UsernameClaimProfileUpdate
-}
-
 // TokenClaimValidationRule - External Auth claim validation rule
 type TokenClaimValidationRule struct {
 	// The required claim rule to be applied.
@@ -1162,26 +996,6 @@ type TokenIssuerProfile struct {
 	// Certificate bundle to use to validate server certificates for the configured URL. It must be PEM encoded and when not specified,
 	// the system trust is used.
 	CA *string
-}
-
-// TokenIssuerProfileUpdate - Token issuer profile This configures how the platform interacts with the identity provider and
-// how tokens issued from the identity provider are evaluated by the Kubernetes API server.
-type TokenIssuerProfileUpdate struct {
-	// This configures the acceptable audiences the JWT token, issued by the identity provider, must be issued to. At least one
-	// of the entries must match the 'aud' claim in the JWT token.
-	// audiences must contain at least one entry and must not exceed ten entries.
-	Audiences []*string
-
-	// The issuer of the token
-	// Certificate bundle to use to validate server certificates for the configured URL. It must be PEM encoded and when not specified,
-	// the system trust is used.
-	CA *string
-
-	// This configures the URL used to issue tokens by the identity provider. The Kubernetes API server determines how authentication
-	// tokens should be handled by matching the 'iss' claim in the JWT to the
-	// issuerURL of configured identity providers.
-	// issuerURL must use the 'https' scheme.
-	URL *string
 }
 
 // TokenRequiredClaim - Token required claim validation rule.
@@ -1233,22 +1047,6 @@ type UserAssignedIdentitiesProfile struct {
 	ServiceManagedIdentity *string
 }
 
-// UserAssignedIdentitiesProfileUpdate - Represents the information related to Azure User-Assigned managed identities needed
-// to perform Operators authentication based on Azure User-Assigned Managed Identities
-type UserAssignedIdentitiesProfileUpdate struct {
-	// The set of Azure User-Assigned Managed Identities leveraged for the Control Plane operators of the cluster. The set of
-	// required managed identities is dependent on the Cluster's OpenShift version.
-	ControlPlaneOperators map[string]*string
-
-	// The set of Azure User-Assigned Managed Identities leveraged for the Data Plane operators of the cluster. The set of required
-	// managed identities is dependent on the Cluster's OpenShift version.
-	DataPlaneOperators map[string]*string
-
-	// Represents the information associated to an Azure User-Assigned Managed Identity whose purpose is to perform service level
-	// actions.
-	ServiceManagedIdentity *string
-}
-
 // UserAssignedIdentity - User assigned identity properties
 type UserAssignedIdentity struct {
 	// READ-ONLY; The client ID of the assigned identity.
@@ -1281,29 +1079,6 @@ type UsernameClaimProfile struct {
 	PrefixPolicy *UsernameClaimPrefixPolicy
 }
 
-// UsernameClaimProfileUpdate - External Auth claim profile This configures how the username of a cluster identity should
-// be constructed from the claims in a JWT token issued by the identity provider.
-type UsernameClaimProfileUpdate struct {
-	// Claim name of the external profile
-	Claim *string
-
-	// Prefix for the claim external profile Must be set when the prefixPolicy field is set to 'Prefix' and must be unset otherwise.
-	Prefix *string
-
-	// Prefix policy is an optional field that configures how a prefix should be applied to the value of the JWT claim specified
-	// in the 'claim' field.
-	// Allowed values are 'Prefix', 'NoPrefix', and 'None'. If not specified, the default policy is 'None'.
-	// When set to 'Prefix', the value specified in the prefix field will be prepended to the value of the JWT claim. The prefix
-	// field must be set when prefixPolicy is 'Prefix'.
-	// When set to 'NoPrefix', no prefix will be prepended to the value of the JWT claim.
-	// When set to 'None', this means no opinion and the platform is left to choose any prefixes that are applied which is subject
-	// to change over time. Currently, the platform prepends {issuerURL}# to the
-	// value of the JWT claim when the claim is not 'email'. As an example, consider the following scenario:prefix is unset, issuerURL
-	// is set to https://myoidc.tld, the JWT claims include "username":"userA"
-	// and "email":"userA
-	PrefixPolicy *UsernameClaimPrefixPolicy
-}
-
 // VersionProfile - Versions represents an OpenShift version.
 type VersionProfile struct {
 	// REQUIRED; ID is the desired X.Y version of the cluster control plane.
@@ -1311,21 +1086,5 @@ type VersionProfile struct {
 
 	// ChannelGroup is the name of the set to which this version belongs. Each version belongs to only a single set.
 	// If not specified, the default value is 'stable'.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
 	ChannelGroup *string
-}
-
-// VersionProfileUpdate - Versions represents an OpenShift version.
-type VersionProfileUpdate struct {
-	// ChannelGroup is the name of the set to which this version belongs. Each version belongs to only a single set.
-	// If not specified, the default value is 'stable'.
-	// Note: The default value is not declared in the API specification because of a TypeSpec bug with updatable fields. The default
-	// value will be declared in a future API version once the TypeSpec bug is
-	// fixed. https://github.com/Azure/typespec-azure/issues/1586
-	ChannelGroup *string
-
-	// ID is the desired X.Y version of the cluster control plane.
-	ID *string
 }
