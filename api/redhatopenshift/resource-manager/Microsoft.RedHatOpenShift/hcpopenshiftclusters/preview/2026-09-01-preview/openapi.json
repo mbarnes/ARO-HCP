@@ -1476,43 +1476,6 @@
         "url"
       ]
     },
-    "Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate": {
-      "type": "object",
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
-      "properties": {
-        "type": {
-          "$ref": "../../../../../../common-types/resource-management/v6/managedidentity.json#/definitions/ManagedServiceIdentityType",
-          "description": "The type of managed identity assigned to this resource."
-        },
-        "userAssignedIdentities": {
-          "type": "object",
-          "description": "The identities assigned to this resource by the user.",
-          "additionalProperties": {
-            "$ref": "../../../../../../common-types/resource-management/v6/managedidentity.json#/definitions/UserAssignedIdentity",
-            "x-nullable": true
-          }
-        }
-      }
-    },
-    "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate": {
-      "type": "object",
-      "title": "Tracked Resource",
-      "description": "The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../common-types/resource-management/v6/types.json#/definitions/Resource"
-        }
-      ]
-    },
     "ClusterAutoscalingProfile": {
       "type": "object",
       "description": "ClusterAutoscaling specifies auto-scaling behavior that\napplies to all NodePools associated with a control plane.",
@@ -1705,21 +1668,6 @@
         }
       }
     },
-    "CustomerManagedEncryptionProfileUpdate": {
-      "type": "object",
-      "description": "Customer managed encryption key profile.",
-      "properties": {
-        "kms": {
-          "$ref": "#/definitions/KmsEncryptionProfileUpdate",
-          "description": "The Key Management Service (KMS) encryption key details.\n\nRequired when encryptionType is \"KMS\".",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
-    },
     "DiskEncryptionSetResourceId": {
       "type": "string",
       "format": "arm-id",
@@ -1827,42 +1775,12 @@
         "keyManagementMode"
       ]
     },
-    "EtcdDataEncryptionProfileUpdate": {
-      "type": "object",
-      "description": "The ETCD data encryption settings.",
-      "properties": {
-        "customerManaged": {
-          "$ref": "#/definitions/CustomerManagedEncryptionProfileUpdate",
-          "description": "Specify customer managed encryption key details.\nRequired when keyManagementMode is \"CustomerManaged\".",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
-    },
     "EtcdProfile": {
       "type": "object",
       "description": "The ETCD settings and configuration options.",
       "properties": {
         "dataEncryption": {
           "$ref": "#/definitions/EtcdDataEncryptionProfile",
-          "description": "ETCD Data Encryption settings.\nIf not specified platform managed keys are used.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
-    },
-    "EtcdProfileUpdate": {
-      "type": "object",
-      "description": "The ETCD settings and configuration options.",
-      "properties": {
-        "dataEncryption": {
-          "$ref": "#/definitions/EtcdDataEncryptionProfileUpdate",
           "description": "ETCD Data Encryption settings.\nIf not specified platform managed keys are used.",
           "x-ms-mutability": [
             "read",
@@ -1910,27 +1828,6 @@
       "required": [
         "mappings"
       ]
-    },
-    "ExternalAuthClaimProfileUpdate": {
-      "type": "object",
-      "description": "External Auth claim profile",
-      "properties": {
-        "mappings": {
-          "$ref": "#/definitions/TokenClaimMappingsProfileUpdate",
-          "description": "The claim mappings"
-        },
-        "validationRules": {
-          "type": "array",
-          "description": "The claim validation rules",
-          "items": {
-            "$ref": "#/definitions/TokenClaimValidationRule"
-          },
-          "x-ms-identifiers": [
-            "type",
-            "requiredClaim"
-          ]
-        }
-      }
     },
     "ExternalAuthClientComponentProfile": {
       "type": "object",
@@ -2071,33 +1968,6 @@
         "claim"
       ]
     },
-    "ExternalAuthPropertiesUpdate": {
-      "type": "object",
-      "description": "External Auth profile",
-      "properties": {
-        "issuer": {
-          "$ref": "#/definitions/TokenIssuerProfileUpdate",
-          "description": "Token Issuer profile"
-        },
-        "clients": {
-          "type": "array",
-          "description": "External Auth OIDC clients\nThere must not be more than 20 entries and entries must have unique namespace/name pairs.",
-          "maxItems": 20,
-          "items": {
-            "$ref": "#/definitions/ExternalAuthClientProfile"
-          },
-          "x-ms-identifiers": [
-            "component",
-            "clientId",
-            "extraScopes"
-          ]
-        },
-        "claim": {
-          "$ref": "#/definitions/ExternalAuthClaimProfileUpdate",
-          "description": "External Auth claim\nThis configures how claims are validated and applied."
-        }
-      }
-    },
     "ExternalAuthProvisioningState": {
       "type": "string",
       "description": "The resource provisioning state.",
@@ -2164,15 +2034,37 @@
       "description": "ExternalAuth resource",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/ExternalAuthPropertiesUpdate",
+          "$ref": "#/definitions/ExternalAuthUpdateProperties",
           "description": "The resource-specific properties for this resource."
         }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../common-types/resource-management/v6/types.json#/definitions/ProxyResource"
+      }
+    },
+    "ExternalAuthUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the ExternalAuth.",
+      "properties": {
+        "issuer": {
+          "$ref": "#/definitions/TokenIssuerProfile",
+          "description": "Token Issuer profile"
+        },
+        "clients": {
+          "type": "array",
+          "description": "External Auth OIDC clients\nThere must not be more than 20 entries and entries must have unique namespace/name pairs.",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/definitions/ExternalAuthClientProfile"
+          },
+          "x-ms-identifiers": [
+            "component",
+            "clientId",
+            "extraScopes"
+          ]
+        },
+        "claim": {
+          "$ref": "#/definitions/ExternalAuthClaimProfile",
+          "description": "External Auth claim\nThis configures how claims are validated and applied."
         }
-      ]
+      }
     },
     "GroupClaimProfile": {
       "type": "object",
@@ -2192,22 +2084,6 @@
       "required": [
         "claim"
       ]
-    },
-    "GroupClaimProfileUpdate": {
-      "type": "object",
-      "description": "External Auth claim profile\nThis configures how the groups of a cluster identity should be constructed\nfrom the claims in a JWT token issued by the identity provider. When\nreferencing a claim, if the claim is present in the JWT token, its value\nmust be a list of groups separated by a comma (',').\n\nFor example - '\"example\"' and '\"exampleOne\", \"exampleTwo\", \"exampleThree\"' are valid claim values.",
-      "properties": {
-        "claim": {
-          "type": "string",
-          "description": "Claim name of the external profile",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "prefix": {
-          "type": "string",
-          "description": "Prefix for the claim external profile\nIf this is specified prefixPolicy will be set to \"Prefix\" by default"
-        }
-      }
     },
     "HcpOpenShiftCluster": {
       "type": "object",
@@ -2440,12 +2316,33 @@
         "platform"
       ]
     },
-    "HcpOpenShiftClusterPropertiesUpdate": {
+    "HcpOpenShiftClusterUpdate": {
       "type": "object",
-      "description": "HCP cluster properties",
+      "description": "HCP cluster resource",
+      "properties": {
+        "identity": {
+          "$ref": "../../../../../../common-types/resource-management/v6/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/HcpOpenShiftClusterUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "HcpOpenShiftClusterUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the HcpOpenShiftCluster.",
       "properties": {
         "version": {
-          "$ref": "#/definitions/VersionProfileUpdate",
+          "$ref": "#/definitions/VersionProfile",
           "description": "Version of the control plane components",
           "x-ms-mutability": [
             "read",
@@ -2454,7 +2351,7 @@
           ]
         },
         "platform": {
-          "$ref": "#/definitions/PlatformProfileUpdate",
+          "$ref": "#/definitions/PlatformProfile",
           "description": "Azure platform configuration",
           "x-ms-mutability": [
             "read",
@@ -2472,7 +2369,7 @@
           ]
         },
         "etcd": {
-          "$ref": "#/definitions/EtcdProfileUpdate",
+          "$ref": "#/definitions/EtcdProfile",
           "description": "Configure ETCD.",
           "x-ms-mutability": [
             "read",
@@ -2509,25 +2406,6 @@
           ]
         }
       }
-    },
-    "HcpOpenShiftClusterUpdate": {
-      "type": "object",
-      "description": "HCP cluster resource",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/HcpOpenShiftClusterPropertiesUpdate",
-          "description": "The resource-specific properties for this resource."
-        },
-        "identity": {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
-          "description": "The managed service identities assigned to this resource."
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"
-        }
-      ]
     },
     "HcpOpenShiftVersion": {
       "type": "object",
@@ -2786,21 +2664,6 @@
         "activeKey"
       ]
     },
-    "KmsEncryptionProfileUpdate": {
-      "type": "object",
-      "description": "Configure etcd encryption Key Management Service (KMS) key.\nYour Microsoft Entra application used to create the cluster must be authorized to access this keyvault,\ne.g using the AzureCLI: `az keyvault set-policy -n $KEYVAULT_NAME --key-permissions decrypt encrypt --spn (YOUR APPLICATION CLIENT ID)`",
-      "properties": {
-        "activeKey": {
-          "$ref": "#/definitions/KmsKeyUpdate",
-          "description": "The details of the active key.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
-    },
     "KmsKey": {
       "type": "object",
       "description": "A representation of a KeyVault Secret.",
@@ -2831,23 +2694,6 @@
         "name",
         "version"
       ]
-    },
-    "KmsKeyUpdate": {
-      "type": "object",
-      "description": "A representation of a KeyVault Secret.",
-      "properties": {
-        "version": {
-          "type": "string",
-          "description": "version contains the version of the key to use.",
-          "minLength": 1,
-          "maxLength": 255,
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
     },
     "Label": {
       "type": "object",
@@ -2955,7 +2801,7 @@
     },
     "NodePool": {
       "type": "object",
-      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
+      "description": "NodePool resource",
       "properties": {
         "properties": {
           "$ref": "#/definitions/NodePoolProperties",
@@ -3169,12 +3015,33 @@
         "platform"
       ]
     },
-    "NodePoolPropertiesUpdate": {
+    "NodePoolUpdate": {
       "type": "object",
-      "description": "Represents the node pool properties",
+      "description": "NodePool resource",
+      "properties": {
+        "identity": {
+          "$ref": "../../../../../../common-types/resource-management/v6/managedidentity.json#/definitions/ManagedServiceIdentity",
+          "description": "The managed service identities assigned to this resource."
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/NodePoolUpdateProperties",
+          "description": "The resource-specific properties for this resource."
+        }
+      }
+    },
+    "NodePoolUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the NodePool.",
       "properties": {
         "version": {
-          "$ref": "#/definitions/NodePoolVersionProfileUpdate",
+          "$ref": "#/definitions/NodePoolVersionProfile",
           "description": "OpenShift version for the nodepool",
           "x-ms-mutability": [
             "read",
@@ -3247,25 +3114,6 @@
         }
       }
     },
-    "NodePoolUpdate": {
-      "type": "object",
-      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/NodePoolPropertiesUpdate",
-          "description": "The resource-specific properties for this resource."
-        },
-        "identity": {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
-          "description": "The managed service identities assigned to this resource."
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"
-        }
-      ]
-    },
     "NodePoolVersionProfile": {
       "type": "object",
       "description": "Versions represents an OpenShift version.",
@@ -3292,30 +3140,6 @@
       "required": [
         "id"
       ]
-    },
-    "NodePoolVersionProfileUpdate": {
-      "type": "object",
-      "description": "Versions represents an OpenShift version.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "ID is the unique identifier of the version.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "channelGroup": {
-          "type": "string",
-          "description": "ChannelGroup is the name of the set to which this version belongs.\nEach version belongs to only a single set.\n\nIf not specified, the default value is 'stable'.\n\nNote: The default value is not declared in the API specification because\nof a TypeSpec bug with updatable fields. The default value will be\ndeclared in a future API version once the TypeSpec bug is fixed.\nhttps://github.com/Azure/typespec-azure/issues/1586",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
     },
     "OperatorIdentityRequired": {
       "type": "string",
@@ -3382,16 +3206,6 @@
       "required": [
         "userAssignedIdentities"
       ]
-    },
-    "OperatorsAuthenticationProfileUpdate": {
-      "type": "object",
-      "description": "The configuration that the operators of the cluster have to authenticate to Azure.",
-      "properties": {
-        "userAssignedIdentities": {
-          "$ref": "#/definitions/UserAssignedIdentitiesProfileUpdate",
-          "description": "Represents the information related to Azure User-Assigned managed identities needed\nto perform Operators authentication based on Azure User-Assigned Managed Identities"
-        }
-      }
     },
     "OsDiskProfile": {
       "type": "object",
@@ -3565,21 +3379,6 @@
         "operatorsAuthentication",
         "issuerUrl"
       ]
-    },
-    "PlatformProfileUpdate": {
-      "type": "object",
-      "description": "Azure specific configuration",
-      "properties": {
-        "operatorsAuthentication": {
-          "$ref": "#/definitions/OperatorsAuthenticationProfileUpdate",
-          "description": "The configuration that the operators of the cluster have to authenticate to Azure",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
     },
     "ProvisioningState": {
       "type": "string",
@@ -3771,20 +3570,6 @@
         "username"
       ]
     },
-    "TokenClaimMappingsProfileUpdate": {
-      "type": "object",
-      "description": "External Auth claim mappings profile.\nAt a minimum username or groups must be defined.",
-      "properties": {
-        "username": {
-          "$ref": "#/definitions/UsernameClaimProfileUpdate",
-          "description": "The claim mappings username."
-        },
-        "groups": {
-          "$ref": "#/definitions/GroupClaimProfileUpdate",
-          "description": "The claim mappings groups."
-        }
-      }
-    },
     "TokenClaimValidationRule": {
       "type": "object",
       "description": "External Auth claim validation rule",
@@ -3842,31 +3627,6 @@
         "url",
         "audiences"
       ]
-    },
-    "TokenIssuerProfileUpdate": {
-      "type": "object",
-      "description": "Token issuer profile\nThis configures how the platform interacts with the identity provider and\nhow tokens issued from the identity provider are evaluated by the Kubernetes API server.",
-      "properties": {
-        "url": {
-          "type": "string",
-          "format": "uri",
-          "description": "This configures the URL used to issue tokens by the identity provider.\nThe Kubernetes API server determines how authentication tokens should be handled\nby matching the 'iss' claim in the JWT to the issuerURL of configured identity providers.\n\nissuerURL must use the 'https' scheme."
-        },
-        "audiences": {
-          "type": "array",
-          "description": "This configures the acceptable audiences the JWT token, issued by the identity\nprovider, must be issued to. At least one of the entries must match the\n'aud' claim in the JWT token.\n\naudiences must contain at least one entry and must not exceed ten entries.",
-          "minItems": 1,
-          "maxItems": 10,
-          "items": {
-            "type": "string"
-          }
-        },
-        "ca": {
-          "type": "string",
-          "description": "The issuer of the token\n\nCertificate bundle to use to validate server certificates for the configured URL.\nIt must be PEM encoded and when not specified, the system trust is used.",
-          "x-ms-client-name": "CA"
-        }
-      }
     },
     "TokenRequiredClaim": {
       "type": "object",
@@ -3931,45 +3691,6 @@
         "dataPlaneOperators",
         "serviceManagedIdentity"
       ]
-    },
-    "UserAssignedIdentitiesProfileUpdate": {
-      "type": "object",
-      "description": "Represents the information related to Azure User-Assigned managed identities needed\nto perform Operators authentication based on Azure User-Assigned Managed Identities",
-      "properties": {
-        "controlPlaneOperators": {
-          "type": "object",
-          "description": "The set of Azure User-Assigned Managed Identities leveraged for the Control Plane\noperators of the cluster. The set of required managed identities is dependent on the\nCluster's OpenShift version.",
-          "additionalProperties": {
-            "$ref": "#/definitions/UserAssignedIdentityResourceId"
-          },
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "dataPlaneOperators": {
-          "type": "object",
-          "description": "The set of Azure User-Assigned Managed Identities leveraged for the Data Plane\noperators of the cluster. The set of required managed identities is dependent on the\nCluster's OpenShift version.",
-          "additionalProperties": {
-            "$ref": "#/definitions/UserAssignedIdentityResourceId"
-          },
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "serviceManagedIdentity": {
-          "$ref": "#/definitions/UserAssignedIdentityResourceId",
-          "description": "Represents the information associated to an Azure User-Assigned Managed Identity whose\npurpose is to perform service level actions.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
     },
     "UserAssignedIdentityResourceId": {
       "type": "string",
@@ -4036,26 +3757,6 @@
         "claim"
       ]
     },
-    "UsernameClaimProfileUpdate": {
-      "type": "object",
-      "description": "External Auth claim profile\nThis configures how the username of a cluster identity should be constructed\nfrom the claims in a JWT token issued by the identity provider.",
-      "properties": {
-        "claim": {
-          "type": "string",
-          "description": "Claim name of the external profile",
-          "minLength": 1,
-          "maxLength": 256
-        },
-        "prefix": {
-          "type": "string",
-          "description": "Prefix for the claim external profile\nMust be set when the prefixPolicy field is set to 'Prefix' and must be unset\notherwise."
-        },
-        "prefixPolicy": {
-          "$ref": "#/definitions/UsernameClaimPrefixPolicy",
-          "description": "Prefix policy is an optional field that configures how a prefix should be\napplied to the value of the JWT claim specified in the 'claim' field.\n\nAllowed values are 'Prefix', 'NoPrefix', and 'None'. If not specified, the\ndefault policy is 'None'.\n\nWhen set to 'Prefix', the value specified in the prefix field will be\nprepended to the value of the JWT claim.\nThe prefix field must be set when prefixPolicy is 'Prefix'.\n\nWhen set to 'NoPrefix', no prefix will be prepended to the value\nof the JWT claim.\n\nWhen set to 'None', this means no opinion and the platform is left to choose\nany prefixes that are applied which is subject to change over time.\nCurrently, the platform prepends `{issuerURL}#` to the value of the JWT claim\nwhen the claim is not 'email'.\nAs an example, consider the following scenario:\n`prefix` is unset, `issuerURL` is set to `https://myoidc.tld`,\nthe JWT claims include \"username\":\"userA\" and \"email\":\"userA"
-        }
-      }
-    },
     "VersionProfile": {
       "type": "object",
       "description": "Versions represents an OpenShift version.",
@@ -4082,30 +3783,6 @@
       "required": [
         "id"
       ]
-    },
-    "VersionProfileUpdate": {
-      "type": "object",
-      "description": "Versions represents an OpenShift version.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "ID is the desired X.Y version of the cluster control plane.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "channelGroup": {
-          "type": "string",
-          "description": "ChannelGroup is the name of the set to which this version belongs.\nEach version belongs to only a single set.\n\nIf not specified, the default value is 'stable'.\n\nNote: The default value is not declared in the API specification because\nof a TypeSpec bug with updatable fields. The default value will be\ndeclared in a future API version once the TypeSpec bug is fixed.\nhttps://github.com/Azure/typespec-azure/issues/1586",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      }
     }
   },
   "parameters": {}

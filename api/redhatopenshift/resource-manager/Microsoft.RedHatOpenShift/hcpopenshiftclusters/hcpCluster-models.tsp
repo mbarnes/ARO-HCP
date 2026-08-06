@@ -34,6 +34,7 @@ model HcpOpenShiftCluster is TrackedResource<HcpOpenShiftClusterProperties> {
 // - deleted when resource group is deleted
 // - allow cascade delete
 // more: https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html
+/** NodePool resource */
 @parentResource(HcpOpenShiftCluster)
 model NodePool is TrackedResource<NodePoolProperties> {
   ...ResourceNameParameter<
@@ -51,6 +52,27 @@ model ExternalAuth is ProxyResource<ExternalAuthProperties> {
     NamePattern = "^[a-zA-Z]([-a-zA-Z0-9]{0,13}[a-zA-Z0-9])?$"
   >;
 }
+
+/** HCP cluster resource */
+model HcpOpenShiftClusterUpdate
+  is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+    HcpOpenShiftCluster,
+    HcpOpenShiftClusterProperties
+  >;
+
+/** NodePool resource */
+model NodePoolUpdate
+  is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+    NodePool,
+    NodePoolProperties
+  >;
+
+/** ExternalAuth resource */
+model ExternalAuthUpdate
+  is Azure.ResourceManager.Foundations.ResourceUpdateModel<
+    ExternalAuth,
+    ExternalAuthProperties
+  >;
 
 /** HCP cluster properties */
 model HcpOpenShiftClusterProperties {
