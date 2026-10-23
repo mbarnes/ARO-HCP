@@ -39,6 +39,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 	utilsclock "k8s.io/utils/clock"
 
+	"github.com/blang/semver/v4"
+
 	azcorearm "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 
 	arohcpv1alpha1 "github.com/openshift-online/ocm-sdk-go/arohcp/v1alpha1"
@@ -338,6 +340,55 @@ func (f *Frontend) ArmResourceListVersion(writer http.ResponseWriter, request *h
 	return nil
 }
 
+func (f *Frontend) ArmResourceListOperatorIdentityRoleSets(writer http.ResponseWriter, request *http.Request) error {
+	ctx := request.Context()
+
+	versionedInterface, err := VersionFromContext(ctx)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+
+	subscriptionID := request.PathValue(PathSegmentSubscriptionID)
+	location := request.PathValue(PathSegmentLocation)
+
+	pagedResponse := coreapi.NewPagedResponse()
+
+	csIterator := f.clusterServiceClient.ListVersions()
+	for csVersion := range csIterator.Items(ctx) {
+		versionName, err := metadataapi.GetMinorOpenShiftVersion(csVersion.ID())
+		if err != nil {
+			return utils.TrackError(err)
+		}
+		stringResource := "/subscriptions/" + subscriptionID + "/providers/" + coreapi.ProviderNamespace +
+			"/locations/" + location + "/" + coreapi.OperatorIdentityRoleSetResourceTypeName + "/" + versionName
+		resourceID, err := azcorearm.ParseResourceID(stringResource)
+		if err != nil {
+			return utils.TrackError(err)
+		}
+		version, err := semver.ParseTolerant(versionName)
+		if err != nil {
+			return utils.TrackError(err)
+		}
+		value, err := marshalClusterScopedIdentitiesConfig(resourceID, &version, f.clusterScopedIdentitiesConfig, versionedInterface)
+		if err != nil {
+			return utils.TrackError(err)
+		}
+		pagedResponse.AddValue(value)
+	}
+	err = csIterator.GetError()
+
+	// Check for iteration error.
+	if err != nil {
+		return utils.TrackError(err)
+	}
+
+	_, err = coreapihelpers.WriteJSONResponse(writer, http.StatusOK, pagedResponse)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+	return nil
+}
+
 // GetOpenshiftVersions implements the GET single resource API contract for ARM
 // * 200 If the resource exists
 // * 404 If the resource does not exist
@@ -359,6 +410,35 @@ func (f *Frontend) GetOpenshiftVersions(writer http.ResponseWriter, request *htt
 		return utils.TrackError(err)
 	}
 	responseBody, err := marshalCSVersion(resourceID, version, versionedInterface)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+
+	_, err = coreapihelpers.WriteJSONResponse(writer, http.StatusOK, responseBody)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+	return nil
+}
+
+func (f *Frontend) GetOperatorIdentityRoleSet(writer http.ResponseWriter, request *http.Request) error {
+	ctx := request.Context()
+
+	versionedInterface, err := VersionFromContext(ctx)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+	resourceID, err := utils.ResourceIDFromContext(ctx)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+
+	roleSetName := resourceID.Name
+	version, err := semver.ParseTolerant(roleSetName)
+	if err != nil {
+		return utils.TrackError(err)
+	}
+	responseBody, err := marshalClusterScopedIdentitiesConfig(resourceID, &version, f.clusterScopedIdentitiesConfig, versionedInterface)
 	if err != nil {
 		return utils.TrackError(err)
 	}
@@ -1272,4 +1352,80 @@ func featuresMap(features *[]coreapi.Feature) map[string]string {
 func marshalCSVersion(resourceID *azcorearm.ResourceID, version *arohcpv1alpha1.Version, versionedInterface coreapi.Version) ([]byte, error) {
 	openShiftVersion := ocm.ConvertCStoOpenShiftVersion(resourceID, version)
 	return coreapi.MarshalJSON(versionedInterface.NewOpenShiftVersion(openShiftVersion))
+}
+
+func marshalClusterScopedIdentitiesConfig(resourceID *azcorearm.ResourceID, version *semver.Version, config *azure.ClusterScopedIdentitiesConfig, versionedInterface coreapi.Version) ([]byte, error) {
+	operatorIdentityRoleSet := &coreapi.OperatorIdentityRoleSet{
+		ProxyResource: coreapi.ProxyResource{
+			Resource: coreapi.Resource{
+				ID:   resourceID,
+				Name: resourceID.Name,
+				Type: resourceID.ResourceType.String(),
+			},
+		},
+		Properties: coreapi.OperatorIdentityRoleSetProperties{
+			ControlPlaneOperators: make([]coreapi.OperatorIdentityRoles, 0),
+			DataPlaneOperators:    make([]coreapi.OperatorIdentityRoles, 0),
+		},
+	}
+
+	// Add control plane operators
+	for _, operator := range config.ControlPlaneOperatorsIdentities {
+		if operator.IsSupportedForOpenshiftVersion(version) {
+			required := coreapi.OperatorIdentityRequiredAlways
+			if operator.Requirement != nil && operator.Requirement.Type == azure.IdentityRequirementTypeOnEnablement {
+				required = coreapi.OperatorIdentityRequiredOnEnablement
+			}
+
+			roleDefinitions := make([]coreapi.RoleDefinition, 0, len(operator.RoleDefinitions))
+			for _, rd := range operator.RoleDefinitions {
+				if rd != nil && rd.ResourceID != nil {
+					roleDefinitions = append(roleDefinitions, coreapi.RoleDefinition{
+						Name:       rd.DescriptiveName,
+						ResourceID: rd.ResourceID.String(),
+					})
+				}
+			}
+
+			operatorIdentityRoleSet.Properties.ControlPlaneOperators = append(
+				operatorIdentityRoleSet.Properties.ControlPlaneOperators,
+				coreapi.OperatorIdentityRoles{
+					Name:            string(operator.ClusterOperatorIdentifier),
+					Required:        required,
+					RoleDefinitions: roleDefinitions,
+				},
+			)
+		}
+	}
+
+	// Add data plane operators
+	for _, operator := range config.DataPlaneOperatorsIdentities {
+		if operator.IsSupportedForOpenshiftVersion(version) {
+			required := coreapi.OperatorIdentityRequiredAlways
+			if operator.Requirement != nil && operator.Requirement.Type == azure.IdentityRequirementTypeOnEnablement {
+				required = coreapi.OperatorIdentityRequiredOnEnablement
+			}
+
+			roleDefinitions := make([]coreapi.RoleDefinition, 0, len(operator.RoleDefinitions))
+			for _, rd := range operator.RoleDefinitions {
+				if rd != nil && rd.ResourceID != nil {
+					roleDefinitions = append(roleDefinitions, coreapi.RoleDefinition{
+						Name:       rd.DescriptiveName,
+						ResourceID: rd.ResourceID.String(),
+					})
+				}
+			}
+
+			operatorIdentityRoleSet.Properties.DataPlaneOperators = append(
+				operatorIdentityRoleSet.Properties.DataPlaneOperators,
+				coreapi.OperatorIdentityRoles{
+					Name:            string(operator.ClusterOperatorIdentifier),
+					Required:        required,
+					RoleDefinitions: roleDefinitions,
+				},
+			)
+		}
+	}
+
+	return coreapi.MarshalJSON(versionedInterface.NewOperatorIdentityRoleSet(operatorIdentityRoleSet))
 }
