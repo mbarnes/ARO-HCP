@@ -26,7 +26,8 @@ const (
 	magenta      = 35
 	cyan         = 36
 	lightGray    = 37
-	darkGray     = 90
+	//darkGray     = 90
+	darkGray     = 38 // mbarnes: overridden
 	lightRed     = 91
 	lightGreen   = 92
 	lightYellow  = 93
